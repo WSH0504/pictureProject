@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>首页</title>
+  <!-- import CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1658828_vud4w73neg.css">
+  <!-- import Vue before Element -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-light">
+  <div id="app">
+    <div class="container-fluid vh-100">
+        <div class="row h-100">
+          <div class="border-right nav-left p-0" style="background-color: #304156;width:12%">
+            <div class="list-group list-group-flush border-top">
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                    <a href="/admin/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-home" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">首页</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                    <a href="/admin/girl/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-order" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">数据管理</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                  <a href="/admin/region/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                      <i class="el-icon-place" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">地区管理</div>
+                  </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px;display: flex;">
+                    <a href="/admin/user/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-custom" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">账户管理</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                  <a href="/admin/system/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                      <i class="el-icon-setting" style="color:#409EFF"></i><div style="color:#409EFF;font-size:15px;margin-left:8px">系统设置</div>
+                  </a>
+                </li>
+            </div>
+          </div>
+          <div style="padding:0px;width:88%">
+            <el-breadcrumb separator="/" style="background: #fff;padding:20px;margin-bottom:20px;">
+              <div style="display: flex;justify-content:space-between;">
+                  <div style="display: flex;align-items: center;">
+                      <el-breadcrumb-item><a href="/admin/">首页</a></el-breadcrumb-item>
+                      <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+                  </div>
+                  <div>
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-toggle="dropdown">
+                          <%= user.username %> 
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="/user/logout">退出</a>
+                      </div>
+                  </div>
+              </div>
+            </el-breadcrumb>
+            <div style="margin-left: 20px;margin-right: 20px;">
+              <div v-if="<%= user.username == 'admin' %>">
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                  <el-tab-pane label="轮播图管理" name="first">
+                    <div style="margin-top:10px;margin-left:20px;">
+                      <el-upload
+                        style="margin-bottom: 20px;"
+                        action=""
+                        :http-request = upqiniu
+                        :show-file-list="false"
+                        :before-upload="beforeUpload">
+                        <el-button type="primary" size="medium">添加照片</el-button>
+                      </el-upload>
+                      <div v-for="(url,i) in img">
+                        <el-image :key="url" :src="url" fit="cover"  style="width:400px;height:auto;margin-right: 10px;"></el-image>
+                        <el-link type="danger" @click="delete1(i)">删除</el-link>
+                      </div>
+                    </div>
+                  </el-tab-pane>
+                  <el-tab-pane label="line管理" name="second">
+                    <div style="margin-top:10px;margin-left:20px;display: flex;">
+                      <div style="padding-top: 5px;">line地址：</div>
+                      <div v-if="edit==false" style="padding-top: 5px;">{{address}}</div>
+                      <div v-else>
+                        <el-input
+                          size="small"
+                          placeholder="请输入地址"
+                          v-model="address_input"
+                          style="width: 300px;">
+                        </el-input>
+                      </div>
+                      <el-button v-if="edit==false" type="primary" size="mini" style="margin-left: 30px;" @click="edit_line">修改</el-button>
+                      <el-button v-if="edit==true" type="primary" size="mini" style="margin-left: 30px;" @click="edit_sure">确定</el-button>
+                      <el-button v-if="edit==true" type="danger" size="mini" @click="edit_close">取消</el-button>
+                    </div>
+                  </el-tab-pane>
+                </el-tabs>
+              </div>
+              <div v-else>您没有权限观看</div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          domain: 'https://upload-z2.qiniup.com',
+          qiniuaddr: 'qmeb0v046.hn-bkt.clouddn.com',
+          img: [],
+          activeName: 'first',
+          address: '',
+          edit: false,
+          address_input: ''
+        }
+      },
+      beforeMount() {
+        var list = '<%= imgList %>'
+        var address = '<%= address %>'
+        list = list.replace(/&#34;/g,'"')
+        list = JSON.parse(list)
+        address = address.replace(/&#34;/g,'"')
+        address = JSON.parse(address)
+        var img = list[0].img.split(";")
+        var img1 = []
+        img.some(item => {
+          if (item != '') {
+            img1.push(item)
+          }
+        })
+        this.img = img1
+        this.address = address[0].address
+        this.address_input = address[0].address
+      },
+      methods: {
+        handleClick() {
+
+        },
+        // 上传文件到七牛云
+        upqiniu (req) {
+          var that = this
+          const config = {
+              headers: {'Content-Type': 'multipart/form-data'}
+          }
+          let filetype = ''
+          if (req.file.type === 'image/png') {
+              filetype = 'png'
+          } else {
+              filetype = 'jpg'
+          }
+          // 重命名要上传的文件
+          const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.' + filetype
+          const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+          const formdata = new FormData()
+          formdata.append('file', req.file)
+          formdata.append('key', keyname)
+          axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+              var img = '/upload/' + res.data.filename + '.' + filetype
+              var imgArr = this.img
+              imgArr.push(img)
+              this.img = imgArr
+              var img1 = []
+              imgArr.some(item => {
+                img1 += item+';'
+              })
+              $.post('/admin/system/addimg', {img: img1}, function(res) {
+                if (res.code === 1) {
+                  that.$message({
+                      message: '添加成功',
+                      type: 'success'
+                  })
+                } else {
+                  that.$message.error('添加失败')
+                }
+              })
+          })
+          // 从后端获取上传凭证token
+          // axios.get('/admin/token').then(res => {
+          //     console.log(res)
+          //     const formdata = new FormData()
+          //     formdata.append('file', req.file)
+          //     formdata.append('token', res.data)
+          //     formdata.append('key', keyname)
+          //     // 获取到凭证之后再将文件上传到七牛云空间
+          //     axios.post(this.domain, formdata, config).then(res => {
+          //       var img = 'http://' + this.qiniuaddr + '/' + res.data.key
+          //       var imgArr = this.img
+          //       imgArr.push(img)
+          //       console.log(imgArr)
+          //       this.img = imgArr
+          //       var img1 = []
+          //       imgArr.some(item => {
+          //         img1 += item+';'
+          //       })
+          //       console.log(img1)
+          //       $.post('/admin/system/addimg', {img: img1}, function(res) {
+          //         if (res.code === 1) {
+          //           that.$message({
+          //               message: '添加成功',
+          //               type: 'success'
+          //           })
+          //         } else {
+          //           that.$message.error('添加失败')
+          //         }
+          //       })
+          //     })
+          // })
+        },
+        // 验证文件合法性
+        beforeUpload (file) {
+            const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+            const isLt2M = file.size / 1024 / 1024 < 2
+            if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG 格式!')
+            }
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!')
+            }
+            return isJPG && isLt2M
+        },
+        delete1(i) {
+          var that = this
+          that.img.splice(i,1)
+          var img1 = []
+          that.img.some(item => {
+            img1 += item+';'
+          })
+          $.post('/admin/system/addimg', {img: img1}, function(res) {
+            if (res.code === 1) {
+              that.$message({
+                  message: '删除成功',
+                  type: 'success'
+              })
+            } else {
+              that.$message.error('删除失败')
+            }
+          })
+        },
+        edit_line() {
+          this.edit = true
+        },
+        edit_sure() {
+          var address = this.address_input
+          var that = this
+          $.post('/admin/system/editline', {address: address}, function(res) {
+            if (res.code === 1) {
+              that.$message({
+                  message: '修改成功',
+                  type: 'success'
+              })
+              that.edit = false
+              that.address = that.address_input
+            } else {
+              that.$message.error('添加失败')
+            }
+          })
+        },
+        edit_close() {
+          this.edit = false
+          this.address_input = this.address
+        }
+      }
+    })
+  </script>
+</body>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
+</html>

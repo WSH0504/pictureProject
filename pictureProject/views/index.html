@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>首页</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1658828_vud4w73neg.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.css">  
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">    
+    <script src="https://unpkg.com/swiper/swiper-bundle.js"> </script>  
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"> </script>
+    <!-- import Vue before Element -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        .app1 {
+            font-family: Nunito,sans-serif;
+            font-size: .9rem;
+            font-weight: 400;
+            line-height: 1.6;
+            color: #212529;
+            margin: 0 auto;
+            max-width: 1200px;
+            background-color: #f9f9f9;
+            min-height: 100vh;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+        }
+        .title {
+            width: 100%;
+            height: 50px;
+            background-color: #000;
+            color: #fff;
+            text-align: left;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .childtitle {
+            padding-left: 20px;
+        }
+        .container {
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .grid-content {
+            border-radius: 5px;
+            min-height: 36px;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+            position: relative;
+        }
+        .name {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .image {
+            max-width: 100%;
+            transition: bottom .2s liner 0s;
+            bottom: 0px;
+            height: 250px;
+            border-radius: 5px;
+            object-fit: cover
+        }
+        .image:hover {
+            position: relative;
+            bottom: 5px;
+            box-shadow: 0 0 4px 4px rgba(0, 0, 0, .12);
+        }
+        .video1 {
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            top: 50%;
+            opacity: 0.9;
+            z-index: 999;
+        }
+        .line {
+            position: fixed;
+            z-index:1;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+        }
+        .el-dropdown  {
+            font-size: 16px;
+        }
+        .header0 {
+            position: fixed;
+            top: 0px;
+            background-color: #ffffff;
+            z-index: 9999;
+            width: 100%;
+            height: 50px;
+        }
+        .header1 {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding-top: 10px;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        .header2 {
+            display: flex;
+            padding-top: 10px;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            list-style: none;
+            white-space:nowrap;
+            margin-top: 50px;
+        }
+        .header2::-webkit-scrollbar {
+            display: none;
+        }
+        .menu {
+            padding: 0 15px;
+            font-size: 17px;
+            white-space: nowrap;
+        }
+        .menu1 {
+            padding: 0 15px;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .city {
+            color: #666666;
+        }
+        .select {
+            color: #000000;
+            border-bottom: 3px solid #ff3900;
+        }
+        .region {
+            color: #a2a2a2;
+        }
+        .region_select {
+            color: #ff5b1b;
+        }
+        .notice {
+            width: 100%;
+        }
+        .swiper-container {
+            width: 100%;
+            height: auto;
+        }
+        @media screen and (max-width: 480px) {
+            .el-image1 {
+                margin-top:10px;
+                width: 92%;
+                height: 200px;
+                margin-left: 4%;
+                margin-right: 4%;
+                border-radius: 5px;
+            }
+        }
+        @media screen and (min-width: 480px) {
+            .el-image1 {
+                margin-top:10px;
+                width: 92%;
+                height: 400px;
+                margin-left: 4%;
+                margin-right: 4%;
+                border-radius: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="app1">
+            <div class="header0">
+                <div class="header1">
+                    <div v-for="(item, i) in region" :key="item.id" class="menu" @click="city_select(item, i)">
+                        <div v-if="i == activeIndex1" class="select">{{item.name}}</div>
+                        <div v-else class="city">{{item.name}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="header2">
+                <div v-for="(item, i) in region[activeIndex1].children" :key="item.id" class="menu1" @click="region_select(item, i)">
+                    <div v-if="i == activeIndex2" class="region_select">{{item.name}}</div>
+                    <div v-else class="region">{{item.name}}</div>
+                </div>
+            </div>
+            <div class="notice">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" v-for="item in img">
+                          <el-image
+                                class="el-image1"
+                                fit="cover"
+                                :src="item"
+                          ></el-image>
+                        </div>
+                    </div>
+                    <!-- 如果需要分页器 -->
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="container">
+                <el-row :gutter="30">
+                    <el-col :xs="12" :sm="6" :lg="4" :xl="4" v-for="(item, i) in content" :key="item.id">
+                        <div class="grid-content">
+                            <div class="name">{{ item.title }}</div>
+                            <div v-if="item.isVideo == 1" class="video1">
+                                <el-image src="http://qkr0wj5tv.hn-bkt.clouddn.com/girl160698303192918.png" style="width:40px;height:40px" />
+                            </div>
+                            <div @click="todetail(item)">
+                                <el-image :src="item.titleimg" :key="item.titleimg" class="image" fit="cover" width="200" lazy />
+                            </div>
+                            <div style="margin-right: 5px;display: flex;justify-content: space-between;">
+                                <div></div>
+                                <div style="display: flex;">
+                                    <div style="height: 30px;display: flex;align-items: center;margin-right: 3px;justify-content: center;">
+                                        <img v-if="item.like == true" src="http://qmeb0v046.hn-bkt.clouddn.com/love1.png" style="width:18px;height:18px;" />
+                                        <img v-if="item.like == false" src="http://qmeb0v046.hn-bkt.clouddn.com/love.png" style="width:17px;height:17px;" @click="like(item, i)" />
+                                    </div>
+                                    <div style="height: 30px;display: flex;align-items: center;justify-content: center;">
+                                        <span style="font-size: 15px;">{{item.like_num}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+        <a :href="address" target="_blank"><el-image src="http://qmeb0v046.hn-bkt.clouddn.com/Line.png" class="line"></el-image></a>
+    </div>
+    <script>
+        setTimeout(() => {
+            var mySwiper = new Swiper ('.swiper-container', {
+                autoplay: {
+                    delay: 3000,
+                    stopOnLastSlide: false,
+                    disableOnInteraction: true,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            })
+        }, 10)
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    region: [],
+                    activeIndex1: 0,
+                    activeIndex2: 0,
+                    list: [],
+                    list1: [],
+                    list2: [],
+                    content: [],
+                    img: [],
+                    address: ''
+                }
+            },
+            beforeMount() {
+                var list = '<%= list %>'
+                var list1 = '<%= list1 %>'
+                var list2 = '<%= list2 %>'
+                var imgList = '<%= imgList %>'
+                var address = '<%= address %>'
+                list = list.replace(/&#34;/g,'"')
+                list = JSON.parse(list)
+                list1 = list1.replace(/&#34;/g,'"')
+                list1 = JSON.parse(list1)
+                list2 = list2.replace(/&#34;/g,'"')
+                list2 = JSON.parse(list2)
+                imgList = imgList.replace(/&#34;/g,'"')
+                imgList = JSON.parse(imgList)
+                address = address.replace(/&#34;/g,'"')
+                address = JSON.parse(address)
+                var img = imgList[0].img.split(";")
+                var img1 = []
+                img.some(item => {
+                if (item != '') {
+                    img1.push(item)
+                }
+                })
+                this.img = img1
+                this.address = address[0].address
+                var region = []
+                list1.some(item => {
+                    var region1 = {}
+                    region1.id = item.id
+                    region1.name = item.name
+                    region1.children = []
+                    var all = {
+                        id: 0,
+                        name: '所有'
+                    }
+                    region1.children.push(all)
+                    list2.some(item2 => {
+                        if(item2.parent_id == item.id) {
+                            var region2 = {}
+                            region2.id = item2.id
+                            region2.name = item2.name
+                            region1.children.push(region2)
+                        }
+                    })
+                    region.push(region1)
+                })
+                list.some(item => {
+                    item.like = false
+                })
+                this.list = list
+                this.list1 = list1
+                this.list2 = list2
+                this.region = region
+                var content = []
+                var storage=window.localStorage
+                if (storage.region2 && storage.region2 != 0) {
+                    this.activeIndex1 = storage.activeIndex11
+                    this.activeIndex2 = storage.activeIndex22
+                    var id = storage.region2
+                    list.some(item => {
+                        if (item.region2 == id) {
+                            content.push(item)
+                        }
+                    })
+                } else if (storage.region1) {
+                    this.activeIndex1 = storage.activeIndex11
+                    var id = storage.region1
+                    list.some(item => {
+                        if (item.region1 == id) {
+                            content.push(item)
+                        }
+                    })
+                } else {
+                    list.some(item => {
+                        if (item.region1 == list1[0].id) {
+                            content.push(item)
+                        }
+                    })
+                }
+                this.content = content
+            },
+            methods: {
+                handleSelect(key, keyPath) {
+                },
+                todetail(girl) {
+                    location.href=`/detail/${girl.id}`
+                },
+                city_select(item, i) {
+                    var id = item.id
+                    var storage=window.localStorage
+                    storage.region1 = id
+                    storage.activeIndex11 = i
+                    var content = []
+                    this.list.some(item => {
+                        if (item.region1 == id) {
+                            content.push(item)
+                        }
+                    })
+                    this.content = content
+                    this.activeIndex1 = i
+                    this.activeIndex2 = 0
+                },
+                region_select(item, i) {
+                    if (item.name == '所有') {
+                        var id = this.list1[this.activeIndex1].id
+                        var content = []
+                        this.list.some(item => {
+                            if (item.region1 == id) {
+                                content.push(item)
+                            }
+                        })
+                        this.content = content
+                    } else {
+                        var id = item.id
+                        var content = []
+                        this.list.some(item => {
+                            if (item.region2 == id) {
+                                content.push(item)
+                            }
+                        })
+                        this.content = content
+                    }
+                    var storage=window.localStorage
+                    storage.region2 = item.id
+                    storage.activeIndex22 = i
+                    this.activeIndex2 = i
+                },
+                like(item, i) {
+                    var id = item.id
+                    this.content[i].like = true
+                    this.content[i].like_num += 1
+                    $.post('/index/like', {id: id})
+                }
+            }
+        })
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,400 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>用户管理 </title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1658828_vud4w73neg.css">
+    <!-- import Vue before Element -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body class="bg-light">
+    <div id="app">
+        <div class="container-fluid vh-100">
+            <div class="row h-100">
+                <div class="border-right nav-left p-0" style="background-color: #304156;width:12%">
+                    <div class="list-group list-group-flush border-top">
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-home" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">首页</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/girl/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-order" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">数据管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/region/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-place" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">地区管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px;display: flex;">
+                            <a href="/admin/user/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-custom" style="color:#409EFF"></i><div style="color:#409EFF;font-size:15px;margin-left:8px">账户管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/system/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-setting" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">系统设置</div>
+                            </a>
+                        </li>
+                    </div>
+                </div>
+                <div style="padding:0px;width:88%">
+                    <el-breadcrumb separator="/" style="background: #fff;padding:20px;margin-bottom:20px;">
+                        <div style="display: flex;justify-content:space-between;">
+                            <div style="display: flex;align-items: center;">
+                                <el-breadcrumb-item><a href="/admin/">首页</a></el-breadcrumb-item>
+                                <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+                            </div>
+                            <div>
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-toggle="dropdown">
+                                    <%= user.username %> 
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="/user/logout">退出</a>
+                                </div>
+                            </div>
+                        </div>
+                    </el-breadcrumb>
+                    <div style="margin-left:20px;margin-right:20px">
+                        <div v-if="<%= user.username == 'admin' %>">
+                            <div style="margin-bottom:20px">
+                                <el-input v-model="input" placeholder="请输入用户名" style="width: 200px;" clearable></el-input>
+                                <el-button type="primary" icon="el-icon-search" size="medium" @click="search">搜索</el-button>
+                                <el-button type="primary" icon="el-icon-edit" size="medium" @click="addUserFunc">添加</el-button>
+                            </div>
+                            <el-table
+                            :data="list"
+                            style="width: 95%;margin-bottom:10px"> 
+                                <el-table-column
+                                    prop="id"
+                                    label="ID"
+                                >
+                                </el-table-column>
+                                <el-table-column
+                                    prop="username"
+                                    label="用户名"
+                                >
+                                </el-table-column>
+                                <el-table-column
+                                    label="密码"
+                                >
+                                    <template>
+                                        <span>
+                                            ******
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button
+                                            size="mini"
+                                            type="primary"
+                                            @click="handleEdit(scope.row.id)">修改密码</el-button>
+                                        <el-button
+                                            size="mini"
+                                            type="danger"
+                                            @click="handleDelete(scope.row.id)">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <el-pagination
+                                :current-page="page1"
+                                :page-size="20"
+                                layout="total, prev, pager, next, jumper"
+                                :total="total"
+                                @current-change="handleCurrentChange"
+                            >
+                            </el-pagination>
+                            <el-dialog title="修改密码" width="30%" :visible.sync="dialogFormVisible">
+                                <el-form :model="form" :rules="rules" ref="form">
+                                    <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
+                                        <el-input v-model="form.password" placeholder="请输入密码" minlength="5" show-password style="width:200px"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="确认密码" prop="password1" :label-width="formLabelWidth">
+                                        <el-input v-model="form.password1" placeholder="请再次输入密码" minlength="5" show-password style="width:200px"></el-input>
+                                    </el-form-item>
+                                </el-form>
+                                <div slot="footer" class="dialog-footer">
+                                    <el-button @click="closeChange">取 消</el-button>
+                                    <el-button type="primary" @click="changepass">确 定</el-button>
+                                </div>
+                            </el-dialog>
+                            <el-dialog title="添加用户" width="30%" :visible.sync="addUser">
+                                <el-form :model="userNew" :rules="userRules" ref="userNew">
+                                    <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
+                                        <el-input v-model="userNew.username" placeholder="请输入用户名" style="width:200px"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
+                                        <el-input v-model="userNew.password" placeholder="请输入密码" show-password style="width:200px"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="确认密码" prop="password1" :label-width="formLabelWidth">
+                                        <el-input v-model="userNew.password1" placeholder="请再次输入密码" show-password style="width:200px"></el-input>
+                                    </el-form-item>
+                                </el-form>
+                                <div slot="footer" class="dialog-footer">
+                                    <el-button @click="closeadd">取 消</el-button>
+                                    <el-button type="primary" @click="addNewUser">确 定</el-button>
+                                </div>
+                            </el-dialog>
+                        </div>
+                        <div v-else>您没有权限观看</div>
+                    </div>
+            </div>
+        </div>
+    </div>
+  </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                var validatePass = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入密码'));
+                    } else if (value.length < 5){
+                        callback(new Error('密码至少5位数'))
+                    } else {
+                        if (this.form.password1 !== '') {
+                            this.$refs.form.validateField('password1');
+                        }
+                        callback();
+                    }
+                };
+                var validatePass2 = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请再次输入密码'));
+                    } else if (value !== this.form.password) {
+                        callback(new Error('两次输入密码不一致!'));
+                    } else {
+                        callback();
+                    }
+                };
+                var validateUserName = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入用户名'));
+                    } else {
+                        callback();
+                    }
+                }
+                var validatePassword = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入密码'));
+                    } else if (value.length < 5){
+                        callback(new Error('密码至少5位数'))
+                    } else {
+                        if (this.userNew.password1 !== '') {
+                            this.$refs.userNew.validateField('password1');
+                        }
+                        callback();
+                    }
+                }
+                var validatePassword2 = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请再次输入密码'));
+                    } else if (value !== this.userNew.password) {
+                        callback(new Error('两次输入密码不一致!'));
+                    } else {
+                        callback();
+                    }
+                }
+                return {
+                    list: [],
+                    dialogFormVisible: false,
+                    form: {
+                        password: '',
+                        password1: '',
+                    },
+                    formLabelWidth: '80px',
+                    rules: {
+                        password: [
+                            { validator: validatePass, trigger: 'blur' }
+                        ],
+                        password1: [
+                            { validator: validatePass2, trigger: 'blur' }
+                        ]
+                    },
+                    changeid: 0,
+                    userInput: '',
+                    addUser: false,
+                    userNew: {
+                        username: '',
+                        password: '',
+                        password1: ''
+                    },
+                    userRules: {
+                        username: [
+                            { validator: validateUserName, trigger: 'blur' }
+                        ],
+                        password: [
+                            { validator: validatePassword, trigger: 'blur' }
+                        ],
+                        password1: [
+                            { validator: validatePassword2, trigger: 'blur' }
+                        ]
+                    },
+                    list: [],
+                    page1: 0,
+                    total: 0,
+                    input: ''
+                }
+            },
+            beforeMount() {
+                var list = '<%= list %>'
+                var total = '<%= userCount %>'
+                list = list.replace(/&#34;/g,'"')
+                list = JSON.parse(list)
+                this.total = parseInt(total)
+                this.list = list
+            },
+            methods: {
+                handleCurrentChange: function(currentPage) {
+                    var that = this
+                    var start = (currentPage - 1) * 20
+                    var size = 20
+                    var input = that.input
+                    if(input == '') {
+                        $.get('/admin/user/getList0', {start: start, size: size}, function(res) {
+                            that.list = res.userList
+                            that.total = parseInt(res.userCount)
+                        })
+                    } else {
+                        $.getJSON('/admin/user/search', {input: input, start: start, size: size}, function(res) {
+                            that.list = res.userList
+                            that.total = parseInt(res.userCount)
+                        })
+                    }
+                    
+                },
+                handleEdit(id) {
+                    this.dialogFormVisible = true
+                    this.changeid = id
+                },
+                closeChange() {
+                    this.form.password = ''
+                    this.form.password1 = ''
+                    this.dialogFormVisible = false
+                },
+                changepass() {
+                    var that=  this
+                    that.$refs['form'].validate((valid) => {
+                        if (valid) {
+                            var id = that.changeid
+                            var password = that.form.password
+                            $.get('/admin/user/changepass', { id: id, password: password }, function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        message: '修改成功',
+                                        type: 'success'
+                                    })
+                                    that.dialogFormVisible = false
+                                    that.form.password = ''
+                                    that.form.password1 = ''
+                                } else {
+                                    that.$message.error('修改失败')
+                                }
+                            })
+                        }
+                    })
+                },
+                search() {
+                    var that = this
+                    var input = that.input
+                    if (input == '') {
+                        var start = 0
+                        var size = 20
+                        $.get('/admin/user/getList0', {start: start, size: size}, function(res) {
+                            that.list = res.userList
+                            that.total = res.userCount
+                        })
+                    } else {
+                        $.getJSON('/admin/user/search', {input: input, start: 0, size: 20}, function(res) {
+                            that.list = res.userList
+                            that.total = parseInt(res.userCount)
+                        })
+                    }
+                    
+                },
+                handleDelete(id) {
+                    var that = this
+                    this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        $.getJSON('/admin/user/del', { id: id }, function (res) {
+                            if (res.code == 1) {
+                                that.$message({
+                                    message: '删除成功',
+                                    type: 'success'
+                                })
+                                setTimeout(function () {
+                                    location.reload()
+                                }, 2000)
+                            } else {
+                                that.$message.error('删除失败')
+                            }
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                    })
+                },
+                addUserFunc() {
+                    var that = this
+                    that.addUser = true
+                },
+                closeadd() {
+                    this.userNew = {
+                        username: '',
+                        password: '',
+                        password1: ''
+                    }
+                    this.addUser = false
+                },
+                addNewUser() {
+                    var that = this
+                    this.$refs['userNew'].validate((valid) => {
+                        if (valid) {
+                            var username = that.userNew.username
+                            var password = that.userNew.password
+                            $.post('/admin/user/add', { username: username, password: password }, function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        message: '添加成功',
+                                        type: 'success'
+                                    })
+                                    that.addUser = false
+                                    setTimeout(function () {
+                                        location.reload()
+                                    }, 2000)
+                                } else if (res.code == 2){
+                                    that.$message({
+                                        message: '用户名已存在',
+                                        type: 'warning'
+                                    })
+                                } else {
+                                    that.$message.error('添加失败')
+                                }
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
+</html>

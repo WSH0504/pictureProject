@@ -1,0 +1,1067 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>数据管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1658828_vud4w73neg.css">
+    <!-- import Vue before Element -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        .avatar-uploader .el-upload {
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            border: 1px dashed #d9d9d9;
+            font-size: 28px;
+            color: #8c939d;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            text-align: center;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div id="app">
+        <div class="container-fluid vh-100">
+            <div class="row h-100">
+                <div class="border-right nav-left p-0" style="background-color: #304156;width:12%;">
+                    <div class="list-group list-group-flush border-top">
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-home" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">首页</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/girl/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-order" style="color:#409EFF"></i><div style="color:#409EFF;font-size:15px;margin-left:8px">数据管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/region/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-place" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">地区管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px;display: flex;">
+                            <a href="/admin/user/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-s-custom" style="color:#ffffff"></i><div style="color:#ffffff;font-size:15px;margin-left:8px">账户管理</div>
+                            </a>
+                        </li>
+                        <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                            <a href="/admin/system/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                                <i class="el-icon-setting" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">系统设置</div>
+                            </a>
+                        </li>
+                    </div>
+                </div>
+                <div style="padding:0px;width:88%">
+                    <el-breadcrumb separator="/" style="background: #fff;padding:20px;margin-bottom:20px;">
+                        <div style="display: flex;justify-content:space-between;">
+                            <div style="display: flex;align-items: center;">
+                                <el-breadcrumb-item><a href="/admin/">首页</a></el-breadcrumb-item>
+                                <el-breadcrumb-item>数据管理</el-breadcrumb-item>
+                            </div>
+                            <div>
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-toggle="dropdown">
+                                    <%= user.username %> 
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="/user/logout">退出</a>
+                                </div>
+                            </div>
+                        </div>
+                    </el-breadcrumb>
+                    <div style="margin-left:20px;margin-right:20px">
+                        <div style="margin-bottom:20px">
+                            <el-input v-model="input" placeholder="请输入标题" style="width: 200px;" clearable></el-input>
+                            <el-select v-if="<%= user.username == 'admin' %>" v-model="author_select" placeholder="请选择发布人" style="width: 200px;" clearable>
+                                <el-option
+                                    v-for="item in author"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                            <el-button type="primary" icon="el-icon-search" size="medium" @click="search">搜索</el-button>
+                            <el-button type="primary" icon="el-icon-edit" size="medium" @click="addDataFunc">添加</el-button>
+                        </div>
+                        <el-table
+                        :data="list"
+                        max-height="800"
+                        style="width: 95%;margin-bottom:10px"> 
+                            <el-table-column
+                                prop="id"
+                                label="ID"
+                                width="50"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                prop="title"
+                                label="标题"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                prop="titleimg"
+                                label="封面图"
+                            >
+                                <template  slot-scope="scope">
+                                    <el-image
+                                        style="width: 100px; height: 100px"
+                                        :src="scope.row.titleimg"
+                                        fit="contain"
+                                        lazy
+                                    ></el-image>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                prop="region1"
+                                label="一级地区"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                prop="region2"
+                                label="二级地区"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                prop="time"
+                                label="发布时间">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.time | dateFormat }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                prop="author"
+                                label="发布人">
+                            </el-table-column>
+                            <el-table-column
+                                prop="like_num"
+                                label="点赞数">
+                            </el-table-column>
+                            <el-table-column label="操作" width="200">
+                                <template slot-scope="scope">
+                                    <el-button
+                                        size="mini"
+                                        type="primary"
+                                        @click="handleEdit(scope.row)">编辑</el-button>
+                                    <el-button 
+                                        @click="handleDelete(scope.row.id)"
+                                        type="danger"
+                                        size="mini">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-pagination
+                            :current-page="page1"
+                            :page-size="10"
+                            layout="total, prev, pager, next, jumper"
+                            :total="total"
+                            @current-change="handleCurrentChange"
+                        >
+                        </el-pagination>
+                        <el-dialog title="添加" width="50%" :visible.sync="addData">
+                            <el-form :model="newData" :rules="newRules" ref="newData">
+                                <el-form-item label="标题" prop="title" :label-width="formLabelWidth">
+                                    <el-input v-model="newData.title" placeholder="请输入标题" maxlength="20" style="width:300px"></el-input>
+                                </el-form-item>
+                                <el-form-item label="封面图" prop="titleimg" :label-width="formLabelWidth">
+                                    <div v-if="newData.titleimg" style="display: flex;">
+                                        <img :src="newData.titleimg" style="width: 100px;height:100px;object-fit: cover">
+                                        <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 5px;" @click="delete_add_img">
+                                    </div>
+                                    <el-upload
+                                        v-else 
+                                        class="avatar-uploader"
+                                        action=''
+                                        :http-request = upqiniu
+                                        :show-file-list="false"
+                                        :before-upload="beforeUpload">
+                                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
+                                </el-form-item>
+                                <el-form-item label="地区" prop="region" :label-width="formLabelWidth">
+                                    <el-cascader
+                                        v-model="newData.region"
+                                        :options="region"
+                                        :props="{ expandTrigger: 'hover' }"
+                                        @change="handleChange"></el-cascader>
+                                </el-form-item>
+                                <el-form-item label="详情" prop="detail" :label-width="formLabelWidth">
+                                    <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="newData.detail" style="width:400px"></el-input>
+
+                                </el-form-item>
+                                <el-form-item label="展示方式" prop="isVideo" :label-width="formLabelWidth">
+                                    <el-radio-group v-model="way" size="medium" @change="change">
+                                        <el-radio label="照片" border></el-radio>
+                                        <el-radio label="视频" border></el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item v-if="newData.isVideo == 0" label="详情图" prop="img" :label-width="formLabelWidth">
+                                    <div style="display:flex;">
+                                        <div v-for="(url,i) in img" style="display: flex;">
+                                            <img :src="url" style="width:100px;height:100px;object-fit: cover"></img>
+                                            <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 2px;margin-right: 10px;" @click="delete_add_img1(i)">
+                                        </div>
+                                        <el-upload
+                                            class="avatar-uploader"
+                                            action=""
+                                            :http-request = upqiniu1
+                                            :show-file-list="false"
+                                            :before-upload="beforeUpload1"
+                                            :limit="5"
+                                            multiple
+                                        > 
+                                            <i v-if="img.length < 5" class="el-icon-plus avatar-uploader-icon"></i>
+                                        </el-upload>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item v-else-if="newData.isVideo == 1" label="视频" prop="video" :label-width="formLabelWidth">
+                                    <div v-if="newData.video" style="display: flex;">
+                                        <video width="320" height="320" controls="controls">
+                                            <source :src="newData.video" type="video/mp4">
+                                        </video>
+                                        <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 5px;" @click="delete_add_img2">
+                                    </div>
+                                    <el-upload
+                                        v-else
+                                        class="avatar-uploader"
+                                        action=""
+                                        :http-request = upqiniu2
+                                        :show-file-list="false"
+                                        :before-upload="beforeUpload2">
+                                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
+                                </el-form-item>
+                            </el-form>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="closeadd">取 消</el-button>
+                                <el-button type="primary" @click="addNewUser">确 定</el-button>
+                            </div>
+                        </el-dialog>
+                        <el-dialog title="修改" width="50%" :visible.sync="updateData1">
+                            <el-form :model="updateData" :rules="updateRules" ref="updateData">
+                                <el-form-item label="标题" prop="title" :label-width="formLabelWidth">
+                                    <el-input v-model="updateData.title" placeholder="请输入标题" maxlength="20" style="width:300px"></el-input>
+                                </el-form-item>
+                                <el-form-item label="封面图" prop="titleimg" :label-width="formLabelWidth">
+                                    <div v-if="updateData.titleimg" style="display: flex;">
+                                        <img :src="updateData.titleimg" style="width: 100px;height:100px;object-fit: cover">
+                                        <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 5px;" @click="delete_edit_img">
+                                    </div>
+                                    <el-upload
+                                        v-else 
+                                        class="avatar-uploader"
+                                        action=""
+                                        :http-request = upqiniu3
+                                        :show-file-list="false"
+                                        :before-upload="beforeUpload">
+                                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
+                                </el-form-item>
+                                <el-form-item label="地区" prop="region" :label-width="formLabelWidth">
+                                    <el-cascader
+                                        v-model="updateData.region"
+                                        :options="region"
+                                        :props="{ expandTrigger: 'hover' }"
+                                        @change="handleChange"></el-cascader>
+                                </el-form-item>
+                                <el-form-item label="详情" prop="detail" :label-width="formLabelWidth">
+                                    <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="updateData.detail" style="width:400px"></el-input>
+                                </el-form-item>
+                                <el-form-item label="展示方式" prop="isVideo" :label-width="formLabelWidth">
+                                    <el-radio-group v-model="way" size="medium" @change="change">
+                                        <el-radio label="照片" border></el-radio>
+                                        <el-radio label="视频" border></el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item v-if="updateData.isVideo == 0" label="详情图" prop="img" :label-width="formLabelWidth">
+                                    <div style="display:flex;">
+                                        <div v-for="(url,i) in img" style="display: flex;">
+                                            <img :src="url" style="width:100px;height:100px;object-fit: cover"></img>
+                                            <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 2px;margin-right: 10px;" @click="delete_add_img1(i)">
+                                        </div>
+                                        <el-upload
+                                            class="avatar-uploader"
+                                            action=""
+                                            :http-request = upqiniu1
+                                            :show-file-list="false"
+                                            :before-upload="beforeUpload1"
+                                            :limit="5"
+                                            multiple
+                                        > 
+                                            <i v-if="img.length < 5" class="el-icon-plus avatar-uploader-icon"></i>
+                                        </el-upload>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item v-else-if="updateData.isVideo == 1" label="视频" prop="video" :label-width="formLabelWidth">
+                                    <div v-if="updateData.video" style="display: flex;">
+                                        <video width="320" height="320" controls="controls">
+                                            <source :src="updateData.video" type="video/mp4">
+                                        </video>
+                                        <img src="http://qmeb0v046.hn-bkt.clouddn.com/girl160974121879441.png" style="width: 20px;height:20px;margin-left: 5px;" @click="delete_edit_img2">
+                                    </div>
+                                    <el-upload
+                                        v-else
+                                        class="avatar-uploader"
+                                        action=""
+                                        :http-request = upqiniu4
+                                        :show-file-list="false"
+                                        :before-upload="beforeUpload2">
+                                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
+                                </el-form-item>
+                            </el-form>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="closeupdate">取 消</el-button>
+                                <el-button type="primary" @click="updateData2">确 定</el-button>
+                            </div>
+                        </el-dialog>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: function() {
+                var validateTitle = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入标题'));
+                    } else {
+                        callback();
+                    }
+                }
+                var validateTitleimg = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请上传照片'));
+                    } else {
+                        callback();
+                    }
+                }
+                var validateDetail = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入详情'));
+                    } else {
+                        callback();
+                    }
+                }
+                return {
+                    list: [],
+                    page1: 0,
+                    total: 0,
+                    region: [],
+                    addData: false,
+                    newData: {
+                        title: '',
+                        titleimg: '',
+                        region: [],
+                        detail: '',
+                        isVideo: 0,
+                        video: '',
+                        img: '',
+                        author: '<%= user.username %>'
+                    },
+                    newRules: {
+                        title: [
+                            { required: true, validator: validateTitle, trigger: 'blur' }
+                        ],
+                        region: [
+                            { required: true, message: '请选择地区', trigger: 'change' }
+                        ],
+                        titleimg: [
+                            { required: true, validator: validateTitleimg, trigger: 'blur' }
+                        ],
+                        detail: [
+                            { required: true, validator: validateDetail, trigger: 'blur' }
+                        ],
+                    },
+                    updateData1: false,
+                    updateData: {
+                        title: '',
+                        titleimg: '',
+                        region: [],
+                        region1: 0,
+                        region2: 0,
+                        detail: '',
+                        isVideo: 0,
+                        video: '',
+                        img: '',
+                        author: ''
+                    },
+                    updateRules: {
+                        title: [
+                            { required: true, validator: validateTitle, trigger: 'blur' }
+                        ],
+                        region: [
+                            { required: true, message: '请选择地区', trigger: 'change' }
+                        ],
+                        titleimg: [
+                            { required: true, validator: validateTitleimg, trigger: 'blur' }
+                        ],
+                        detail: [
+                            { required: true, validator: validateDetail, trigger: 'blur' }
+                        ],
+                    },
+                    img: [],
+                    way: '照片',
+                    formLabelWidth: '100px',
+                    domain: 'https://upload-z2.qiniup.com',
+                    qiniuaddr: 'qmeb0v046.hn-bkt.clouddn.com',
+                    list1: [],
+                    list2: [],
+                    input: '',
+                    author_select: '',
+                    author: []
+                }
+            },
+            filters: {
+                dateFormat(value) {
+                    var _this = this
+                    var date = new Date(value)
+                    var year = date.getFullYear()
+                    var m = date.getMonth()+1
+                    var month = m < 10 ? '0' + m : m
+                    var d = date.getDate()
+                    var day = d < 10 ? '0' + d : d
+                    var h = date.getHours()
+                    var hour = h < 10 ? '0' + h : h
+                    var mi = date.getMinutes()
+                    var minutes = mi < 10 ? '0' + mi : mi
+                    var s = date.getSeconds()
+                    var seconds = s < 10 ? '0' + s : s
+                    return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds
+                }
+            },
+            beforeMount() {
+                var girl = '<%= girl %>'
+                var total = '<%= total %>'
+                var list1 = '<%= list1 %>'
+                var list2 = '<%= list2 %>'
+                var authors = '<%= authors %>'
+                girl = girl.replace(/&#34;/g,'"')
+                girl = girl.replace(/&lt;/g,'<')
+                girl = girl.replace(/&gt;/g,'>')
+                girl = JSON.parse(girl)
+                list1 = list1.replace(/&#34;/g,'"')
+                list1 = JSON.parse(list1)
+                list2 = list2.replace(/&#34;/g,'"')
+                list2 = JSON.parse(list2)
+                authors = authors.replace(/&#34;/g,'"')
+                authors = JSON.parse(authors)
+                for(let i of girl) {
+                    list1.some(item => {
+                        if(item.id == i.region1) {
+                            i.region1 = item.name
+                        }
+                    })
+                    list2.some(item => {
+                        if(item.id == i.region2) {
+                            i.region2 = item.name
+                        }
+                    })
+                }
+                this.list = girl
+                this.list1 = list1
+                this.list2 = list2
+                this.total = parseInt(total)
+                var region = []
+                var author = []
+                list1.some(item => {
+                    var region1 = {}
+                    region1.value = item.name
+                    region1.label = item.name
+                    region1.children = []
+                    list2.some(item2 => {
+                        if(item2.parent_id == item.id) {
+                            var region2 = {}
+                            region2.value = item2.name
+                            region2.label = item2.name
+                            region1.children.push(region2)
+                        }
+                    })
+                    region.push(region1)
+                })
+                authors.some(item => {
+                    var author1 = {}
+                    author1.value = item.username
+                    author1.label = item.username
+                    author.push(author1)
+                })
+                this.region = region
+                this.author = author
+            },
+            methods: {    
+                handleChange(value) {
+                },
+                handleCurrentChange: function(currentPage) {
+                    var that = this
+                    var start = (currentPage - 1) * 10
+                    var size = 10
+                    var input = that.input
+                    var author_select = that.author_select
+                    if (input == '' && author_select == '') {
+                        $.get('/admin/girl/getList0', {start: start, size: size}, function(res) {
+                            var girl = res.girl
+                            for(let i of girl) {
+                                that.list1.some(item => {
+                                    if(item.id == i.region1) {
+                                        i.region1 = item.name
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.id == i.region2) {
+                                        i.region2 = item.name
+                                    }
+                                })
+                            }
+                            that.list = girl
+                            that.total = parseInt(res.userCount)
+                        })
+                    } else {
+                        $.getJSON('/admin/girl/search', {input: input, author_select:author_select, start: start, size: size}, function(res) {
+                            var girl = res.girl
+                            for(let i of girl) {
+                                that.list1.some(item => {
+                                    if(item.id == i.region1) {
+                                        i.region1 = item.name
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.id == i.region2) {
+                                        i.region2 = item.name
+                                    }
+                                })
+                            }
+                            that.list = girl
+                            that.total = parseInt(res.userCount)
+                        })
+                    }
+                },
+                addDataFunc() {
+                    var that = this
+                    that.addData = true
+                    that.img = []
+                    that.newData = {
+                        title: '',
+                        titleimg: '',
+                        region: [],
+                        detail: '',
+                        isVideo: 0,
+                        video: '',
+                        img: '',
+                        author: '<%= user.username %>'
+                    }
+                    that.way = '照片'
+                },
+                // 上传文件到七牛云
+                upqiniu (req) {
+                    let filetype = ''
+                    if (req.file.type === 'image/png') {
+                        filetype = 'png'
+                    } else {
+                        filetype = 'jpg'
+                    }
+                    // 重命名要上传的文件
+                    const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.' + filetype
+                    const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+                    const formdata = new FormData()
+                    formdata.append('file', req.file)
+                    formdata.append('key', keyname)
+                    axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+                        this.newData.titleimg = '/upload/' + res.data.filename + '.' + filetype
+                    })
+                    // // 从后端获取上传凭证token
+                    // axios.get('/admin/token').then(res => {
+                    //     console.log(res)
+                        
+                    //     // 获取到凭证之后再将文件上传到七牛云空间
+                    //     axios.post(this.domain, formdata, config).then(res => {
+                    //         this.newData.titleimg = 'http://' + this.qiniuaddr + '/' + res.data.key
+                    //         // console.log(this.imageUrl)
+                    //     })
+                    // })
+                },
+                upqiniu3 (req) {
+                    const config = {
+                        headers: {'Content-Type': 'multipart/form-data'}
+                    }
+                    let filetype = ''
+                    if (req.file.type === 'image/png') {
+                        filetype = 'png'
+                    } else {
+                        filetype = 'jpg'
+                    }
+                    // 重命名要上传的文件
+                    const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.' + filetype
+                    const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+                    const formdata = new FormData()
+                    formdata.append('file', req.file)
+                    formdata.append('key', keyname)
+                    axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+                        this.updateData.titleimg = '/upload/' + res.data.filename + '.' + filetype
+                    })
+                    // 从后端获取上传凭证token
+                    // axios.get('/admin/token').then(res => {
+                    //     console.log(res)
+                    //     const formdata = new FormData()
+                    //     formdata.append('file', req.file)
+                    //     formdata.append('token', res.data)
+                    //     formdata.append('key', keyname)
+                    //     // 获取到凭证之后再将文件上传到七牛云空间
+                    //     axios.post(this.domain, formdata, config).then(res => {
+                    //         this.updateData.titleimg = 'http://' + this.qiniuaddr + '/' + res.data.key
+                    //         // console.log(this.imageUrl)
+                    //     })
+                    // })
+                },
+                // 验证文件合法性
+                beforeUpload (file) {
+                    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+                    const isLt2M = file.size / 1024 / 1024 < 2
+                    if (!isJPG) {
+                        this.$message.error('上传图片只能是 JPG 格式!')
+                    }
+                    if (!isLt2M) {
+                        this.$message.error('上传图片大小不能超过 2MB!')
+                    }
+                    return isJPG && isLt2M
+                },
+                // 验证文件合法性
+                beforeUpload1 (file) {
+                    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+                    const isLt5M = file.size / 1024 / 1024 < 5
+                    if (!isJPG) {
+                        this.$message.error('上传图片只能是 JPG 格式!')
+                    }
+                    if (!isLt5M) {
+                        this.$message.error('上传图片大小不能超过 5MB!')
+                    }
+                    return isJPG && isLt5M
+                },
+                upqiniu1 (req) {
+                    const config = {
+                        headers: {'Content-Type': 'multipart/form-data'}
+                    }
+                    let filetype = ''
+                    if (req.file.type === 'image/png') {
+                        filetype = 'png'
+                    } else {
+                        filetype = 'jpg'
+                    }
+                    // 重命名要上传的文件
+                    const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.' + filetype
+                    const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+                    const formdata = new FormData()
+                    formdata.append('file', req.file)
+                    formdata.append('key', keyname)
+                    axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+                        var img = '/upload/' + res.data.filename + '.' + filetype
+                        var imgArr = this.img
+                        imgArr.push(img)
+                        this.img = imgArr
+                    })
+                    // 从后端获取上传凭证token
+                    // axios.get('/admin/token').then(res => {
+                    //     console.log(res)
+                    //     const formdata = new FormData()
+                    //     formdata.append('file', req.file)
+                    //     formdata.append('token', res.data)
+                    //     formdata.append('key', keyname)
+                    //     // 获取到凭证之后再将文件上传到七牛云空间
+                    //     axios.post(this.domain, formdata, config).then(res => {
+                    //         var img = 'http://' + this.qiniuaddr + '/' + res.data.key
+                    //         var imgArr = this.img
+                    //         imgArr.push(img)
+                    //         console.log(imgArr)
+                    //         this.img = imgArr
+                    //     })
+                    // })
+                },
+                beforeUpload2(file) {
+                    var fileSize = file.size / 1024 / 1024 < 50;
+                    if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) == -1) {
+                        this.$message.error("请上传正确的视频格式");
+                        return false;
+                    }
+                    if (!fileSize) {
+                        this.$message.error("视频大小不能超过50MB");
+                        return false;
+                    } 
+                },
+                upqiniu2 (req) {
+                    const config = {
+                        headers: {'Content-Type': 'multipart/form-data'}
+                    }
+                    let filetype = ''
+                    if (req.file.type === 'video/mp4') {
+                        filetype = 'mp4'
+                    } else if (req.file.type === 'video/ogg') {
+                        filetype = 'ogg'
+                    } else if (req.file.type === 'video/flv') {
+                        filetype = 'flv'
+                    } else if (req.file.type === 'video/avi') {
+                        filetype = 'avi'
+                    } else if (req.file.type === 'video/wmv') {
+                        filetype = 'wmv'
+                    } else if (req.file.type === 'video/rmvb') {
+                        filetype = 'wmv'
+                    } else if (req.file.type === 'video/mov') {
+                        filetype = 'mov'
+                    }
+                    // 重命名要上传的文件
+                    const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.mp4'
+                    const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+                    const formdata = new FormData()
+                    formdata.append('file', req.file)
+                    formdata.append('key', keyname)
+                    axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+                        this.newData.video = '/upload/' + res.data.filename + '.' + filetype
+                    })
+                    // 从后端获取上传凭证token
+                    // axios.get('/admin/token').then(res => {
+                    //     console.log(res)
+                    //     const formdata = new FormData()
+                    //     formdata.append('file', req.file)
+                    //     formdata.append('token', res.data)
+                    //     formdata.append('key', keyname)
+                    //     // 获取到凭证之后再将文件上传到七牛云空间
+                    //     axios.post(this.domain, formdata, config).then(res => {
+                    //         console.log(res)
+                    //         this.newData.video = 'http://' + this.qiniuaddr + '/' + res.data.key
+                    //         console.log(this.newData.video)
+                    //     })
+                    // })
+                },
+                upqiniu4 (req) {
+                    const config = {
+                        headers: {'Content-Type': 'multipart/form-data'}
+                    }
+                    let filetype = ''
+                    if (req.file.type === 'video/mp4') {
+                        filetype = 'mp4'
+                    } else if (req.file.type === 'video/ogg') {
+                        filetype = 'ogg'
+                    } else if (req.file.type === 'video/flv') {
+                        filetype = 'flv'
+                    } else if (req.file.type === 'video/avi') {
+                        filetype = 'avi'
+                    } else if (req.file.type === 'video/wmv') {
+                        filetype = 'wmv'
+                    } else if (req.file.type === 'video/rmvb') {
+                        filetype = 'wmv'
+                    } else if (req.file.type === 'video/mov') {
+                        filetype = 'mov'
+                    }
+                    // 重命名要上传的文件
+                    const keyname = 'girl' + new Date().getTime() + Math.floor(Math.random() * 100) + '.mp4'
+                    const headerConfig = { headers: { 'Content-Type': 'multipart/form-data' }}
+                    const formdata = new FormData()
+                    formdata.append('file', req.file)
+                    formdata.append('key', keyname)
+                    axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
+                        this.updateData.video = '/upload/' + res.data.filename + '.' + filetype
+                    })
+                    // 从后端获取上传凭证token
+                    // axios.get('/admin/token').then(res => {
+                    //     console.log(res)
+                    //     const formdata = new FormData()
+                    //     formdata.append('file', req.file)
+                    //     formdata.append('token', res.data)
+                    //     formdata.append('key', keyname)
+                    //     // 获取到凭证之后再将文件上传到七牛云空间
+                    //     axios.post(this.domain, formdata, config).then(res => {
+                    //         this.updateData.video = 'http://' + this.qiniuaddr + '/' + res.data.key
+                    //     })
+                    // })
+                },
+                closeadd() {
+                    this.addData = false
+                    this.newData = {
+                        title: '',
+                        titleimg: '',
+                        region: [],
+                        detail: '',
+                        isVideo: 0,
+                        video: '',
+                        img: '',
+                        author: '<%= user.username %>'
+                    }
+                    this.img = [],
+                    this.way = '照片'
+                },
+                delete_add_img() {
+                    this.newData.titleimg = ''
+                },
+                delete_add_img1(i) {
+                    this.img.splice(i,1)
+                },
+                delete_edit_img() {
+                    this.updateData.titleimg = ''
+                },
+                delete_add_img1(i) {
+                    this.img.splice(i,1)
+                },
+                delete_add_img2() {
+                    this.newData.video = ''
+                },
+                delete_edit_img1() {
+                    this.updateData.video = ''
+                },
+                addNewUser() {
+                    var that = this
+                    that.$refs['newData'].validate((valid) => {
+                        if (valid) {
+                            if (that.newData.isVideo == 0) {
+                                if (that.img == []) {
+                                    this.$message.error('请上传一些详情图')
+                                    return
+                                }
+                                var img = ''
+                                for (var i = 0; i < that.img.length - 1; i++) {
+                                    img += that.img[i] + ';'
+                                }
+                                img += that.img[that.img.length - 1] + ''
+                                that.newData.img = img
+                                that.newData.video = ''
+                            } else if (that.newData.isVideo == 1) {
+                                if (that.newData.video == '') {
+                                    this.$message.error('请上传一段视频')
+                                    return
+                                }
+                                that.newData.img = ''
+                            } 
+                                that.list1.some(item => {
+                                    if(item.name == that.newData.region[0]) {
+                                        that.newData.region1 = item.id
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.name == that.newData.region[1]) {
+                                        that.newData.region2 = item.id
+                                    }
+                                })
+                                $.post('/admin/girl/add', { newData: that.newData }, function(res) {
+                                    if (res.code === 1) {
+                                        that.$message({
+                                            message: '添加成功',
+                                            type: 'success'
+                                        })
+                                        that.addData = false
+                                        setTimeout(function () {
+                                            location.reload()
+                                        }, 2000)
+                                    } else {
+                                        that.$message.error('添加失败')
+                                    }
+                                })
+                        }
+                    })
+                },
+                change(value) {
+                    if (value == '照片') {
+                        this.newData.isVideo = 0
+                    } else if (value == '视频') {
+                        this.newData.isVideo = 1
+                    }
+                },
+                handleDelete(id) {
+                    var that = this
+                    this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        $.getJSON('/admin/girl/del', { id: id }, function (res) {
+                            if (res.code == 1) {
+                                that.$message({
+                                    message: '删除成功',
+                                    type: 'success'
+                                })
+                                setTimeout(function () {
+                                    location.reload()
+                                }, 2000)
+                            } else {
+                                that.$message.error('删除失败')
+                            }
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                    })
+                },
+                closeupdate() {
+                    this.updateData1 = false
+                    this.img = []
+                },
+                handleEdit(row) {
+                    var that = this
+                    var updateData = Object.assign({}, row)
+                    var imgStr = row.img.split(";")
+                    that.img = imgStr
+                    if (row.isVideo == 0) {
+                        that.way = '照片'
+                    } else if (row.isVideo == 1) {
+                        that.way = '视频'
+                    }
+                    updateData.region = []
+                    updateData.region.push(updateData.region1)
+                    updateData.region.push(updateData.region2)
+                    updateData.detail = updateData.detail.replace(/<br>/g, '\n')
+                    that.updateData = updateData
+                    that.updateData1 = true
+                },
+                updateData2() {
+                    var that = this
+                    that.$refs['updateData'].validate((valid) => {
+                        if (valid) {
+                            if (that.updateData.isVideo == 0) {
+                                if (that.img == []) {
+                                    this.$message.error('请上传一些详情图')
+                                    return
+                                }
+                                var img = ''
+                                for (var i = 0; i < that.img.length - 1; i++) {
+                                    img += that.img[i] + ';'
+                                }
+                                img += that.img[that.img.length - 1] + ''
+                                that.updateData.img = img
+                                that.updateData.video = ''
+                            } else if (that.updateData.isVideo == 1) {
+                                if (that.updateData.video == '') {
+                                    this.$message.error('请上传一段视频')
+                                    return
+                                }
+                                that.updateData.img = ''
+                            } 
+                                that.list1.some(item => {
+                                    if(item.name == that.updateData.region[0]) {
+                                        that.updateData.region1 = item.id
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.name == that.updateData.region[1]) {
+                                        that.updateData.region2 = item.id
+                                    }
+                                })
+                                $.post('/admin/girl/edit', { updateData: that.updateData }, function(res) {
+                                if (res.code === 1) {
+                                    that.$message({
+                                        message: '修改成功',
+                                        type: 'success'
+                                    })
+                                    that.addData = false
+                                    setTimeout(function () {
+                                        location.reload()
+                                    }, 2000)
+                                } else {
+                                    that.$message.error('修改失败')
+                                }
+                            })
+                            
+                        }
+                    })
+                },
+                search() {
+                    var that = this
+                    var input = that.input
+                    var author_select = that.author_select
+                    if (input == '' && author_select == '') {
+                        var start = 0
+                        var size = 10
+                        $.get('/admin/girl/getList0', {start: start, size: size}, function(res) {
+                            var girl = res.girl
+                            for(let i of girl) {
+                                that.list1.some(item => {
+                                    if(item.id == i.region1) {
+                                        i.region1 = item.name
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.id == i.region2) {
+                                        i.region2 = item.name
+                                    }
+                                })
+                            }
+                            that.list = girl
+                            that.total = parseInt(res.userCount)
+                        })
+                    } else {
+                        $.getJSON('/admin/girl/search', {input: input, author_select:author_select, start: 0, size: 10}, function(res) {
+                            var girl = res.girl
+                            for(let i of girl) {
+                                that.list1.some(item => {
+                                    if(item.id == i.region1) {
+                                        i.region1 = item.name
+                                    }
+                                })
+                                that.list2.some(item => {
+                                    if(item.id == i.region2) {
+                                        i.region2 = item.name
+                                    }
+                                })
+                            }
+                            that.list = girl
+                            that.total = parseInt(res.userCount)
+                        })
+                    }
+                }
+            }
+        })
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/17.0.0/classic/ckeditor.js"></script>
+    <script>
+        function sethot(id, hot) {
+            $.get('/admin/article/sethot', { id: id, hot: hot ? 1 : 0 }, function (res) {
+                if (res.code == 1) {
+                    showToasts('成功', '设置热门成功')
+                } else {
+                    showToasts('失败', '设置热门失败')
+                }
+            })
+        }
+
+        function del(id) {
+            $.getJSON('/admin/article/del', { id: id }, function (res) {
+                if (res.code == 1) {
+                    showToasts('成功', '删除成功')
+                    setTimeout(function () {
+                        location.reload()
+                    }, 5000)
+                } else {
+                    showToasts('失败', '删除失败')
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>·

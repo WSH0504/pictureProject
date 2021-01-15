@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>地区管理</title>
+  <!-- import CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1658828_vud4w73neg.css">
+    <!-- import Vue before Element -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body class="bg-light">
+  <div id="app">
+    <div class="container-fluid vh-100">
+        <div class="row h-100">
+          <div class="border-right nav-left p-0" style="background-color: #304156;width:12%">
+            <div class="list-group list-group-flush border-top">
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                    <a href="/admin/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-home" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">首页</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                    <a href="/admin/girl/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-order" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">数据管理</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                  <a href="/admin/region/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                      <i class="el-icon-place" style="color:#409EFF"></i><div style="color:#409EFF;font-size:15px;margin-left:8px">地区管理</div>
+                  </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px;display: flex;">
+                    <a href="/admin/user/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                        <i class="el-icon-s-custom" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">账户管理</div>
+                    </a>
+                </li>
+                <li class="list-group-item list-group-item-action" style="background-color:#304156;border:0px">
+                  <a href="/admin/system/" class="text-decoration-none text-secondary" style="display: flex;align-items: center;height: 40px;">
+                      <i class="el-icon-setting" style="color:#fff"></i><div style="color:#fff;font-size:15px;margin-left:8px">系统设置</div>
+                  </a>
+                </li>
+            </div>
+          </div>
+          <div style="padding:0px;width:88%">
+            <el-breadcrumb separator="/" style="background: #fff;padding:20px;margin-bottom:20px;">
+              <div style="display: flex;justify-content:space-between;">
+                  <div style="display: flex;align-items: center;">
+                      <el-breadcrumb-item><a href="/admin/">首页</a></el-breadcrumb-item>
+                      <el-breadcrumb-item><a href="/admin/region/">地区管理</a></el-breadcrumb-item>
+                      <el-breadcrumb-item v-if="isParent==false">{{row.name}}</el-breadcrumb-item>
+                  </div>
+                  <div>
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-toggle="dropdown">
+                          <%= user.username %> 
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="/user/logout">退出</a>
+                      </div>
+                  </div>
+              </div>
+            </el-breadcrumb>
+            <div style="margin-right:20px;margin-left:20px;">
+              <div v-if="<%= user.username == 'admin' %>">
+                <div style="margin-bottom: 20px">
+                  <el-button v-if="isParent == false" type="primary" icon="el-icon-back" size="medium" @click="return1">返回</el-button>
+                  <el-button v-if="isParent == false" type="primary" icon="el-icon-edit" size="medium" @click="addRegion1">添加</el-button>
+                  <el-button v-if="isParent == true" type="primary" icon="el-icon-edit" size="medium" @click="addRegion">添加</el-button>
+                </div>
+                <el-table
+                v-if="isParent==true"
+                :data="list"
+                style="width:95%;margin-bottom:10px"
+                >
+                  <el-table-column
+                    prop="id"
+                    label="ID"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="name"
+                    label="地区名"
+                  >
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.isSet">
+                        <el-input v-model="scope.row.name" placeholder="请输入内容" size="medium" style="width:200px"></el-input>
+                      </span>
+                      <span v-else><el-link type="primary" @click="tochild(scope.row)">{{scope.row.name}}</el-link></span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="操作">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.isSet">
+                        <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handlePreserve(scope.row)">保存</el-button>
+                        <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleClose(scope.row)">取消</el-button>
+                          </span>
+                      </span>
+                      <span v-else>
+                        <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                        <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.row.id)">删除</el-button>
+                          </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  v-if="isParent==true"
+                  :current-page="<%= page.p %>"
+                  :page-size="20"
+                  layout="total, prev, pager, next, jumper"
+                  :total="<%= page.count %>"
+                  @current-change="handleCurrentChange"
+                >
+                </el-pagination>
+                <el-table
+                v-if="isParent==false"
+                :data="list1"
+                style="width:95%;margin-bottom:10px"
+                >
+                  <el-table-column
+                    prop="id"
+                    label="ID"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="name"
+                    label="地区名"
+                  >
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.isSet">
+                        <el-input v-model="scope.row.name" placeholder="请输入内容" size="medium" style="width:200px"></el-input>
+                      </span>
+                      <span v-else>{{scope.row.name}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    prop="id"
+                    label="上一级地区名"
+                  >
+                    <template slot-scope="scope">
+                      <span>{{row.name}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="操作">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.isSet">
+                        <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handlePreserve1(scope.row)">保存</el-button>
+                        <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleClose1(scope.row)">取消</el-button>
+                          </span>
+                      </span>
+                      <span v-else>
+                        <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleEdit1(scope.row)">编辑</el-button>
+                        <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete1(scope.row.id)">删除</el-button>
+                          </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  v-if="isParent==false"
+                  :current-page="page1"
+                  :page-size="20"
+                  layout="total, prev, pager, next, jumper"
+                  :total="total"
+                  @current-change="handleCurrentChange1"
+                >
+                </el-pagination>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          list: '',
+          status: '',
+          name: '',
+          isParent: true,
+          list1: [],
+          row: [],
+          status1: '',
+          name1: '',
+          total: 0,
+          page1: 0,
+        }
+      },
+      beforeMount() {
+        var a = '<%= page.list %>'
+        var b = a.replace(/&#34;/g,'"')
+        var c = JSON.parse(b)
+        for(var i = 0; i < c.length; i++) {
+          c[i].isSet = false
+        }
+        this.list = c
+      },
+      methods: {
+        handleCurrentChange(currentPage) {
+          window.location = `/admin/user?p=${currentPage}`
+        },
+        handleCurrentChange1(currentPage) {
+          window.location = `/admin/user?p=${currentPage}`
+        },
+        handleEdit(row) {
+          if (this.status == '') {
+            this.status = 'edit'
+            this.name = row.name
+            row.isSet = true
+          } else {
+            this.$message.warning('请先保存当前项')
+          }
+        },
+        handleEdit1(row) {
+          if (this.status1 == '') {
+            this.status1 = 'edit'
+            this.name1 = row.name
+            row.isSet = true
+          } else {
+            this.$message.warning('请先保存当前项')
+          }
+        },
+        handleDelete(id) {
+          var that = this
+          this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            $.getJSON('/admin/region/del', { id: id }, function (res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+                setTimeout(function () {
+                  location.reload()
+                }, 2000)
+                $.getJSON('/admin/region/del1', { id: id })
+              } else {
+                that.$message.error('删除失败')
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          })
+        },
+        handleDelete1(id) {
+          var that = this
+          this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            $.getJSON('/admin/region/del2', { id: id }, function (res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+                that.tochild(that.row)
+              } else {
+                that.$message.error('删除失败')
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          })
+        },
+        addRegion() {
+          if (this.status == '') {
+            var j = { id: 0, "name": '', "isSet": true }
+            var list = [j].concat(this.list)
+            this.list = list
+            this.status = 'add'
+          } else {
+            this.$message.warning('请先保存当前项')
+          }
+        },
+        addRegion1() {
+          if (this.status1 == '') {
+            var j = { id: 0, "name": '', "isSet": true }
+            var list1 = [j].concat(this.list1)
+            this.list1 = list1
+            this.status1 = 'add'
+          } else {
+            this.$message.warning('请先保存当前项')
+          }
+        },
+        handleClose(row) {
+          if (this.status == 'add') {
+            this.list.shift()
+            this.status = ''
+          } else if (this.status == 'edit') {
+            row.isSet = false
+            row.name = this.name
+            this.status = ''
+          }
+        },
+        handleClose1(row) {
+          if (this.status1 == 'add') {
+            this.list1.shift()
+            this.status1 = ''
+          } else if (this.status1 == 'edit') {
+            row.isSet = false
+            row.name = this.name1
+            this.status1 = ''
+          }
+        },
+        handlePreserve(row) {
+          if (row.name == '') {
+            this.$message.error('地区名不能为空')
+          } else if (this.status == 'add') {
+            var name = row.name
+            var that = this
+            $.post('/admin/region/add', { name: name }, function(res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '添加成功',
+                  type: 'success'
+                })
+                that.status = ''
+                setTimeout(function () {
+                  location.reload()
+                }, 2000)
+              } else {
+                that.$message.error('添加失败')
+              }
+            })
+          } else if (this.status == 'edit') {
+            var id = row.id
+            var name = row.name
+            var that = this
+            $.get('/admin/region/edit', { id: id, name: name }, function(res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '修改成功',
+                  type: 'success'
+                })
+                that.status = ''
+                row.isSet = false
+              } else {
+                that.$message.error('修改失败')
+              }
+            })
+          }
+        },
+        handlePreserve1(row) {
+          if (row.name == '') {
+            this.$message.error('地区名不能为空')
+          } else if (this.status1 == 'add') {
+            var name = row.name
+            var that = this
+            $.post('/admin/region/add1', { name: name, parent_id: that.row.id }, function(res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '添加成功',
+                  type: 'success'
+                })
+                that.status1 = ''
+                that.tochild(that.row)
+              } else {
+                that.$message.error('添加失败')
+              }
+            })
+          } else if (this.status1 == 'edit') {
+            var id = row.id
+            var name = row.name
+            var that = this
+            $.get('/admin/region/edit1', { id: id, name: name }, function(res) {
+              if (res.code == 1) {
+                that.$message({
+                  message: '修改成功',
+                  type: 'success'
+                })
+                that.status1 = ''
+                row.isSet = false
+              } else {
+                that.$message.error('修改失败')
+              }
+            })
+          }
+        },
+        return1() {
+          this.isParent = true
+        },
+        tochild(row) {
+          var that = this
+          that.isParent = false
+          that.row = row
+          $.get('/admin/region/child', { id: row.id }, function(res) {
+            var c = res.list
+            for(var i = 0; i < c.length; i++) {
+              c[i].isSet = false
+            }
+            that.list1 = c
+          })
+          $.get('/admin/region/child1', { id: row.id }, function(res) {
+            var total = res.total
+            that.total = total
+          })
+        }
+      }
+    })
+  </script>
+</body>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
+</html>

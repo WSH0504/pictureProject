@@ -95,4 +95,4 @@ app.get('/user/logout', (req, res) => {
 })
 
 //监听服务器
-app.listen(3001)
+app.listen(80)

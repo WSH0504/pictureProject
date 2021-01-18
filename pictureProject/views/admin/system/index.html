@@ -162,7 +162,7 @@
           formdata.append('file', req.file)
           formdata.append('key', keyname)
           axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-              var img = ':3000/upload/' + res.data.filename + '.' + filetype
+              var img = 'http://185.243.57.225:3000/upload/' + res.data.filename + '.' + filetype
               var imgArr = this.img
               imgArr.push(img)
               this.img = imgArr

@@ -589,7 +589,7 @@
                     formdata.append('file', req.file)
                     formdata.append('key', keyname)
                     axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-                        this.newData.titleimg = '/upload/' + res.data.filename + '.' + filetype
+                        this.newData.titleimg = ':3000/upload/' + res.data.filename + '.' + filetype
                     })
                     // // 从后端获取上传凭证token
                     // axios.get('/admin/token').then(res => {
@@ -619,7 +619,7 @@
                     formdata.append('file', req.file)
                     formdata.append('key', keyname)
                     axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-                        this.updateData.titleimg = '/upload/' + res.data.filename + '.' + filetype
+                        this.updateData.titleimg = ':3000/upload/' + res.data.filename + '.' + filetype
                     })
                     // 从后端获取上传凭证token
                     // axios.get('/admin/token').then(res => {
@@ -676,7 +676,7 @@
                     formdata.append('file', req.file)
                     formdata.append('key', keyname)
                     axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-                        var img = '/upload/' + res.data.filename + '.' + filetype
+                        var img = ':3000/upload/' + res.data.filename + '.' + filetype
                         var imgArr = this.img
                         imgArr.push(img)
                         this.img = imgArr
@@ -736,7 +736,7 @@
                     formdata.append('file', req.file)
                     formdata.append('key', keyname)
                     axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-                        this.newData.video = '/upload/' + res.data.filename + '.' + filetype
+                        this.newData.video = ':3000/upload/' + res.data.filename + '.' + filetype
                     })
                     // 从后端获取上传凭证token
                     // axios.get('/admin/token').then(res => {
@@ -780,7 +780,7 @@
                     formdata.append('file', req.file)
                     formdata.append('key', keyname)
                     axios.post('/admin/uploadphoto', formdata, headerConfig).then(res => {
-                        this.updateData.video = '/upload/' + res.data.filename + '.' + filetype
+                        this.updateData.video = ':3000/upload/' + res.data.filename + '.' + filetype
                     })
                     // 从后端获取上传凭证token
                     // axios.get('/admin/token').then(res => {

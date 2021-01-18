@@ -170,6 +170,7 @@
               imgArr.some(item => {
                 img1 += item+';'
               })
+            consoel.log(img1)
               $.post('/admin/system/addimg', {img: img1}, function(res) {
                 if (res.code === 1) {
                   that.$message({

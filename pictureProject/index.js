@@ -63,7 +63,7 @@ app.post('/admin/uploadphoto', upload.single('file'), (req, res, next) => {
         // file.path ==> 上传后的文件路径
         fs.renameSync(file.path, file.path + extname)
         // file.filename ==> 上传后的文件名
-        req.uploadUrl = '/upload/' + file.filename + extname
+        req.uploadUrl = 'http://185.243.57.225:3000/upload/' + file.filename + extname
         res.send(file)
     }
     next()

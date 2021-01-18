@@ -112,8 +112,6 @@
       el: '#app',
       data() {
         return {
-          domain: 'https://upload-z2.qiniup.com',
-          qiniuaddr: 'qmeb0v046.hn-bkt.clouddn.com',
           img: [],
           activeName: 'first',
           address: '',
@@ -170,7 +168,7 @@
               imgArr.some(item => {
                 img1 += item+';'
               })
-            consoel.log(img1)
+            console.log(img1)
               $.post('/admin/system/addimg', {img: img1}, function(res) {
                 if (res.code === 1) {
                   that.$message({

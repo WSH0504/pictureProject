@@ -289,7 +289,7 @@
                                     <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="updateData.detail" style="width:400px"></el-input>
                                 </el-form-item>
                                 <el-form-item label="展示方式" prop="isVideo" :label-width="formLabelWidth">
-                                    <el-radio-group v-model="way" size="medium" @change="change">
+                                    <el-radio-group v-model="way" size="medium" @change="change1">
                                         <el-radio label="照片" border></el-radio>
                                         <el-radio label="视频" border></el-radio>
                                     </el-radio-group>
@@ -885,6 +885,13 @@
                         this.newData.isVideo = 1
                     }
                 },
+                change1(value) {
+                    if (value == '照片') {
+                        this.updateData.isVideo = 0
+                    } else if (value == '视频') {
+                        this.updateData.isVideo = 1
+                    }
+                },
                 handleDelete(id) {
                     var that = this
                     this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -1038,30 +1045,6 @@
     <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.5.12/dist/g2.min.js"></script>
     <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.2/dist/data-set.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/17.0.0/classic/ckeditor.js"></script>
-    <script>
-        function sethot(id, hot) {
-            $.get('/admin/article/sethot', { id: id, hot: hot ? 1 : 0 }, function (res) {
-                if (res.code == 1) {
-                    showToasts('成功', '设置热门成功')
-                } else {
-                    showToasts('失败', '设置热门失败')
-                }
-            })
-        }
-
-        function del(id) {
-            $.getJSON('/admin/article/del', { id: id }, function (res) {
-                if (res.code == 1) {
-                    showToasts('成功', '删除成功')
-                    setTimeout(function () {
-                        location.reload()
-                    }, 5000)
-                } else {
-                    showToasts('失败', '删除失败')
-                }
-            })
-        }
-    </script>
 </body>
 
 </html>·

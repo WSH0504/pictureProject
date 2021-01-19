@@ -213,7 +213,7 @@
                         <div class="grid-content">
                             <div class="name">{{ item.title }}</div>
                             <div v-if="item.isVideo == 1" class="video1">
-                                <el-image src="http://qkr0wj5tv.hn-bkt.clouddn.com/girl160698303192918.png" style="width:40px;height:40px" />
+                                <el-image src="http://185.243.57.225:3000/upload/play.png" style="width:40px;height:40px" />
                             </div>
                             <div @click="todetail(item)">
                                 <el-image :src="item.titleimg" :key="item.titleimg" class="image" fit="cover" width="200" lazy />
@@ -222,8 +222,8 @@
                                 <div></div>
                                 <div style="display: flex;">
                                     <div style="height: 30px;display: flex;align-items: center;margin-right: 3px;justify-content: center;">
-                                        <img v-if="item.like == true" src="http://qmeb0v046.hn-bkt.clouddn.com/love1.png" style="width:18px;height:18px;" />
-                                        <img v-if="item.like == false" src="http://qmeb0v046.hn-bkt.clouddn.com/love.png" style="width:17px;height:17px;" @click="like(item, i)" />
+                                        <img v-if="item.like == true" src="http://185.243.57.225:3000/upload/love1.png" style="width:18px;height:18px;" />
+                                        <img v-if="item.like == false" src="http://185.243.57.225:3000/upload/love.png" style="width:17px;height:17px;" @click="like(item, i)" />
                                     </div>
                                     <div style="height: 30px;display: flex;align-items: center;justify-content: center;">
                                         <span style="font-size: 15px;">{{item.like_num}}</span>
@@ -235,7 +235,7 @@
                 </el-row>
             </div>
         </div>
-        <a :href="address" target="_blank"><el-image src="http://qmeb0v046.hn-bkt.clouddn.com/Line.png" class="line"></el-image></a>
+        <a :href="address" target="_blank"><el-image src="http://185.243.57.225:3000/upload/Line.png" class="line"></el-image></a>
     </div>
     <script>
         setTimeout(() => {
